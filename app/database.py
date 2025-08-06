@@ -3,6 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
 
+# Railway provides PostgreSQL via DATABASE_URL, fallback to SQLite for local dev
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./avird_data.db")
 
 engine = create_engine(DATABASE_URL)

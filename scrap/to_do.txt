@@ -15,13 +15,15 @@ To do
         contact
         incident
 
-    heroku prototype
+    deply prototype
 
     then the agents
+        fault
 
 
 stretch
-
+    waymo data
+    regular pull and update (avird backend)
 
 Backlog
 	protopype local works with postgres
@@ -57,7 +59,7 @@ MVP website
 
 stretch ideas
     better front end?
-    
+
 	something agentic that creates a page or analysis or view based on user input
         user input to issue
         issue to code

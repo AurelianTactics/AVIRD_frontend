@@ -18,9 +18,19 @@ async def home(request: Request):
 async def get_data(limit: int = 10):
     try:
         with engine.connect() as conn:
-            # Get all columns dynamically
-            columns_result = conn.execute(text("PRAGMA table_info(incident_reports)"))
-            columns = [row[1] for row in columns_result.fetchall()]
+            # Get all columns dynamically (works for both SQLite and PostgreSQL)
+            if "sqlite" in str(engine.url):
+                columns_result = conn.execute(text("PRAGMA table_info(incident_reports)"))
+                columns = [row[1] for row in columns_result.fetchall()]
+            else:
+                # PostgreSQL
+                columns_result = conn.execute(text("""
+                    SELECT column_name 
+                    FROM information_schema.columns 
+                    WHERE table_name = 'incident_reports'
+                    ORDER BY ordinal_position
+                """))
+                columns = [row[0] for row in columns_result.fetchall()]
             
             # Query the data
             query = text(f"SELECT * FROM incident_reports LIMIT :limit")
