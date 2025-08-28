@@ -75,4 +75,6 @@ stretch ideas
     create MCP
 	existing analysis tools or frameworks
 		connect to existing or external MCP
+
+    using google maps API to pull in more information on the incident sites and surrondin areas
 	
