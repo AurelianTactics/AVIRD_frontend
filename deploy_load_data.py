@@ -7,10 +7,11 @@ from app.data_loader_flexible import load_data_flexible
 
 def deploy_load_data():
     """Load data in production environment"""
-    database_url = os.getenv("DATABASE_URL")
+    # Try public URL first (for railway run), then internal URL (for deployed app)
+    database_url = os.getenv("DATABASE_PUBLIC_URL") or os.getenv("DATABASE_URL")
     
     if not database_url:
-        print("ERROR: DATABASE_URL environment variable not found")
+        print("ERROR: Neither DATABASE_PUBLIC_URL nor DATABASE_URL found")
         print("Make sure Railway PostgreSQL service is connected")
         return
     

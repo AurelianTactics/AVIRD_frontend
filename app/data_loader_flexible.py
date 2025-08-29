@@ -26,6 +26,19 @@ def clean_column_name(col_name):
 
 def load_data_flexible():
     """Load all CSV columns dynamically into database"""
+    # Use public URL if available (for railway run), otherwise use the configured engine
+    database_url = os.getenv("DATABASE_PUBLIC_URL")
+    if database_url:
+        print(f"Using PUBLIC database URL: {database_url[:50]}...")
+        local_engine = create_engine(database_url)
+    else:
+        print("Using default database engine...")
+        local_engine = engine
+    
+    print("Creating database tables...")
+    from .database import Base
+    Base.metadata.create_all(bind=local_engine)
+    
     print("Loading CSV data...")
     csv_path = "data/nhtsa_sgo/SGO-2021-01_Incident_Reports_ADS.csv"
     
@@ -66,14 +79,14 @@ def load_data_flexible():
     # Insert everything directly using pandas to_sql
     # Use smaller chunks to avoid SQLite variable limit
     print(f"Creating table and inserting {len(df)} rows...")
-    df.to_sql('incident_reports', engine, if_exists='replace', index=False, 
+    df.to_sql('incident_reports', local_engine, if_exists='replace', index=False, 
               chunksize=50)
     
     print("Data loading complete!")
     print(f"Table created with columns: {list(df.columns)}")
     
     # Show a sample of what was inserted
-    with engine.connect() as conn:
+    with local_engine.connect() as conn:
         result = conn.execute(text("SELECT COUNT(*) as count FROM incident_reports"))
         count = result.fetchone()[0]
         print(f"Verification: {count} rows inserted successfully")
