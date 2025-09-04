@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incident Report - {{ report_id }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .tab-content {
+            border: 1px solid #ddd;
+            border-top: none;
+            padding: 20px;
+        }
+        .field-label {
+            font-weight: bold;
+            color: #495057;
+        }
+        .field-value {
+            margin-bottom: 10px;
+        }
+        .narrative-section {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .data-section {
+            margin-bottom: 30px;
+        }
+        .loading-spinner {
+            text-align: center;
+            padding: 50px;
+        }
+        .error-message {
+            color: #dc3545;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .info-card {
+            background-color: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .key-info-table {
+            margin-bottom: 0;
+        }
+        .key-info-table th {
+            background-color: #f8f9fa;
+            width: 40%;
+            border-right: 2px solid #e9ecef;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/">AVIRD Data Analyzer</a>
+                <div class="navbar-nav">
+                    <a class="nav-link" href="/">Reports</a>
+                    <a class="nav-link" href="/entities">Entity Statistics</a>
+                </div>
+            </div>
+        </nav>
+
+        <div id="loading" class="loading-spinner">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading incident data...</p>
+        </div>
+
+        <div id="content" style="display: none;">
+            <!-- Header Section -->
+            <div class="info-card">
+                <h2 id="incidentTitle">Incident Report</h2>
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table table-sm key-info-table">
+                            <tbody>
+                                <tr>
+                                    <th>Report ID</th>
+                                    <td id="reportId"></td>
+                                </tr>
+                                <tr>
+                                    <th>Operating Entity</th>
+                                    <td id="operatingEntity"></td>
+                                </tr>
+                                <tr>
+                                    <th>Incident Date</th>
+                                    <td id="incidentDate"></td>
+                                </tr>
+                                <tr>
+                                    <th>Location</th>
+                                    <td id="location"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-sm key-info-table">
+                            <tbody>
+                                <tr>
+                                    <th>Automation Engaged</th>
+                                    <td id="automationEngaged"></td>
+                                </tr>
+                                <tr>
+                                    <th>Crash With</th>
+                                    <td id="crashWith"></td>
+                                </tr>
+                                <tr>
+                                    <th>Highest Injury Severity</th>
+                                    <td id="injurySeverity"></td>
+                                </tr>
+                                <tr>
+                                    <th>Property Damage</th>
+                                    <td id="propertyDamage"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs Navigation -->
+            <ul class="nav nav-tabs" id="incidentTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab">
+                        Description
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="vehicle-tab" data-bs-toggle="tab" data-bs-target="#vehicle" type="button" role="tab">
+                        Vehicle Info
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="environment-tab" data-bs-toggle="tab" data-bs-target="#environment" type="button" role="tab">
+                        Environment
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="crash-details-tab" data-bs-toggle="tab" data-bs-target="#crash-details" type="button" role="tab">
+                        Crash Details
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="investigation-tab" data-bs-toggle="tab" data-bs-target="#investigation" type="button" role="tab">
+                        Investigation
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="all-data-tab" data-bs-toggle="tab" data-bs-target="#all-data" type="button" role="tab">
+                        All Data
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tab Contents -->
+            <div class="tab-content" id="incidentTabContent">
+                <!-- Description Tab -->
+                <div class="tab-pane fade show active" id="description" role="tabpanel">
+                    <div id="narrativeSection" class="narrative-section" style="display: none;">
+                        <h5>Incident Narrative</h5>
+                        <p id="narrativeText"></p>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Incident Details</h6>
+                            <div class="field-value"><span class="field-label">Time:</span> <span id="incidentTime"></span></div>
+                            <div class="field-value"><span class="field-label">Same Incident ID:</span> <span id="sameIncidentId"></span></div>
+                            <div class="field-value"><span class="field-label">Notice Received Date:</span> <span id="noticeReceivedDate"></span></div>
+                            <div class="field-value"><span class="field-label">Within ODD:</span> <span id="withinOdd"></span></div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Source Information</h6>
+                            <div id="sourceInfo"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vehicle Info Tab -->
+                <div class="tab-pane fade" id="vehicle" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Vehicle Information</h6>
+                            <div class="field-value"><span class="field-label">Make:</span> <span id="vehicleMake"></span></div>
+                            <div class="field-value"><span class="field-label">Model:</span> <span id="vehicleModel"></span></div>
+                            <div class="field-value"><span class="field-label">Model Year:</span> <span id="vehicleYear"></span></div>
+                            <div class="field-value"><span class="field-label">VIN:</span> <span id="vehicleVin"></span></div>
+                            <div class="field-value"><span class="field-label">Mileage:</span> <span id="vehicleMileage"></span></div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>System Information</h6>
+                            <div class="field-value"><span class="field-label">ADS System Version:</span> <span id="adsSystemVersion"></span></div>
+                            <div class="field-value"><span class="field-label">ADS Hardware Version:</span> <span id="adsHardwareVersion"></span></div>
+                            <div class="field-value"><span class="field-label">ADS Software Version:</span> <span id="adsSoftwareVersion"></span></div>
+                            <div class="field-value"><span class="field-label">ADS Equipped:</span> <span id="adsEquipped"></span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Environment Tab -->
+                <div class="tab-pane fade" id="environment" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Road Conditions</h6>
+                            <div class="field-value"><span class="field-label">Roadway Type:</span> <span id="roadwayType"></span></div>
+                            <div class="field-value"><span class="field-label">Roadway Surface:</span> <span id="roadwaySurface"></span></div>
+                            <div class="field-value"><span class="field-label">Roadway Description:</span> <span id="roadwayDescription"></span></div>
+                            <div class="field-value"><span class="field-label">Posted Speed Limit:</span> <span id="speedLimit"></span></div>
+                            <div class="field-value"><span class="field-label">Lighting:</span> <span id="lighting"></span></div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Weather Conditions</h6>
+                            <div id="weatherInfo"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Crash Details Tab -->
+                <div class="tab-pane fade" id="crash-details" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Subject Vehicle</h6>
+                            <div class="field-value"><span class="field-label">Pre-Crash Movement:</span> <span id="svPreCrashMovement"></span></div>
+                            <div class="field-value"><span class="field-label">Pre-crash Speed:</span> <span id="svPrecrashSpeed"></span></div>
+                            <div class="field-value"><span class="field-label">Air Bags Deployed:</span> <span id="svAirBags"></span></div>
+                            <div class="field-value"><span class="field-label">Vehicle Towed:</span> <span id="svTowed"></span></div>
+                            <div class="field-value"><span class="field-label">Contact Areas:</span> <span id="svContactAreas"></span></div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Crash Partner</h6>
+                            <div class="field-value"><span class="field-label">Pre-Crash Movement:</span> <span id="cpPreCrashMovement"></span></div>
+                            <div class="field-value"><span class="field-label">Air Bags Deployed:</span> <span id="cpAirBags"></span></div>
+                            <div class="field-value"><span class="field-label">Vehicle Towed:</span> <span id="cpTowed"></span></div>
+                            <div class="field-value"><span class="field-label">Contact Areas:</span> <span id="cpContactAreas"></span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Investigation Tab -->
+                <div class="tab-pane fade" id="investigation" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Investigation Details</h6>
+                            <div class="field-value"><span class="field-label">Law Enforcement Investigating:</span> <span id="lawEnforcementInvestigating"></span></div>
+                            <div class="field-value"><span class="field-label">Investigating Agency:</span> <span id="investigatingAgency"></span></div>
+                            <div class="field-value"><span class="field-label">Rep Entity/Mfr Investigating:</span> <span id="repEntInvestigating"></span></div>
+                            <div class="field-value"><span class="field-label">Officer Name:</span> <span id="officerName"></span></div>
+                            <div class="field-value"><span class="field-label">Officer Phone:</span> <span id="officerPhone"></span></div>
+                            <div class="field-value"><span class="field-label">Officer Email:</span> <span id="officerEmail"></span></div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Data Availability</h6>
+                            <div id="dataAvailability"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- All Data Tab -->
+                <div class="tab-pane fade" id="all-data" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-sm" id="allDataTable">
+                            <thead>
+                                <tr>
+                                    <th>Field</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody id="allDataBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="error" class="error-message" style="display: none;"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const reportId = "{{ report_id }}";
+            loadIncidentData(reportId);
+        });
+
+        async function loadIncidentData(reportId) {
+            try {
+                const response = await fetch(`/api/incident/${reportId}`);
+                const result = await response.json();
+                
+                if (result.error) {
+                    showError(result.error);
+                    return;
+                }
+
+                const incident = result.incident;
+                populateIncidentData(incident);
+                
+                // Hide loading, show content
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+
+            } catch (error) {
+                console.error('Error loading incident:', error);
+                showError('Failed to load incident data');
+            }
+        }
+
+        function showError(message) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').textContent = message;
+            document.getElementById('error').style.display = 'block';
+        }
+
+        function populateIncidentData(incident) {
+            // Header information
+            document.getElementById('reportId').textContent = incident.report_id || 'N/A';
+            document.getElementById('operatingEntity').textContent = incident.operating_entity || 'N/A';
+            document.getElementById('incidentDate').textContent = incident.incident_date || 'N/A';
+            document.getElementById('location').textContent = `${incident.city || ''}, ${incident.state || ''}`.trim().replace(/^,|,$/, '') || 'N/A';
+            document.getElementById('automationEngaged').textContent = incident.automation_system_engaged || 'N/A';
+            document.getElementById('crashWith').textContent = incident.crash_with || 'N/A';
+            document.getElementById('injurySeverity').textContent = incident.highest_injury_severity_alleged || 'N/A';
+            document.getElementById('propertyDamage').textContent = incident.property_damage || 'N/A';
+
+            // Description tab
+            if (incident.narrative) {
+                document.getElementById('narrativeSection').style.display = 'block';
+                document.getElementById('narrativeText').textContent = incident.narrative;
+            }
+            document.getElementById('incidentTime').textContent = incident.incident_time_2400 || 'N/A';
+            document.getElementById('sameIncidentId').textContent = incident.same_incident_id || 'N/A';
+            document.getElementById('noticeReceivedDate').textContent = incident.notice_received_date || 'N/A';
+            document.getElementById('withinOdd').textContent = incident.within_odd || 'N/A';
+
+            // Source information
+            populateSourceInfo(incident);
+
+            // Vehicle info tab
+            document.getElementById('vehicleMake').textContent = incident.make || 'N/A';
+            document.getElementById('vehicleModel').textContent = incident.model || 'N/A';
+            document.getElementById('vehicleYear').textContent = incident.model_year || 'N/A';
+            document.getElementById('vehicleVin').textContent = incident.vin || 'N/A';
+            document.getElementById('vehicleMileage').textContent = incident.mileage || 'N/A';
+            document.getElementById('adsSystemVersion').textContent = incident.adas_ads_system_version || 'N/A';
+            document.getElementById('adsHardwareVersion').textContent = incident.adas_ads_hardware_version || 'N/A';
+            document.getElementById('adsSoftwareVersion').textContent = incident.adas_ads_software_version || 'N/A';
+            document.getElementById('adsEquipped').textContent = incident.ads_equipped || 'N/A';
+
+            // Environment tab
+            document.getElementById('roadwayType').textContent = incident.roadway_type || 'N/A';
+            document.getElementById('roadwaySurface').textContent = incident.roadway_surface || 'N/A';
+            document.getElementById('roadwayDescription').textContent = incident.roadway_description || 'N/A';
+            document.getElementById('speedLimit').textContent = incident.posted_speed_limit_mph ? `${incident.posted_speed_limit_mph} MPH` : 'N/A';
+            document.getElementById('lighting').textContent = incident.lighting || 'N/A';
+
+            // Weather information
+            populateWeatherInfo(incident);
+
+            // Crash details tab
+            document.getElementById('svPreCrashMovement').textContent = incident.sv_pre_crash_movement || 'N/A';
+            document.getElementById('svPrecrashSpeed').textContent = incident.sv_precrash_speed_mph ? `${incident.sv_precrash_speed_mph} MPH` : 'N/A';
+            document.getElementById('svAirBags').textContent = incident.sv_any_air_bags_deployed || 'N/A';
+            document.getElementById('svTowed').textContent = incident.sv_was_vehicle_towed || 'N/A';
+            document.getElementById('cpPreCrashMovement').textContent = incident.cp_pre_crash_movement || 'N/A';
+            document.getElementById('cpAirBags').textContent = incident.cp_any_air_bags_deployed || 'N/A';
+            document.getElementById('cpTowed').textContent = incident.cp_was_vehicle_towed || 'N/A';
+
+            // Contact areas
+            populateContactAreas(incident);
+
+            // Investigation tab
+            document.getElementById('lawEnforcementInvestigating').textContent = incident.law_enforcement_investigating || 'N/A';
+            document.getElementById('investigatingAgency').textContent = incident.investigating_agency || 'N/A';
+            document.getElementById('repEntInvestigating').textContent = incident.rep_ent_or_mfr_investigating || 'N/A';
+            document.getElementById('officerName').textContent = incident.investigating_officer_name || 'N/A';
+            document.getElementById('officerPhone').textContent = incident.investigating_officer_phone || 'N/A';
+            document.getElementById('officerEmail').textContent = incident.investigating_officer_email || 'N/A';
+
+            // Data availability
+            populateDataAvailability(incident);
+
+            // All data tab
+            populateAllData(incident);
+        }
+
+        function populateSourceInfo(incident) {
+            const sources = [];
+            if (incident.source_complaint_claim === 'Y') sources.push('Complaint/Claim');
+            if (incident.source_telematics === 'Y') sources.push('Telematics');
+            if (incident.source_law_enforcement === 'Y') sources.push('Law Enforcement');
+            if (incident.source_field_report === 'Y') sources.push('Field Report');
+            if (incident.source_testing === 'Y') sources.push('Testing');
+            if (incident.source_media === 'Y') sources.push('Media');
+            if (incident.source_other === 'Y') sources.push(`Other: ${incident.source_other_text || ''}`);
+            
+            document.getElementById('sourceInfo').innerHTML = sources.length > 0 ? sources.join(', ') : 'N/A';
+        }
+
+        function populateWeatherInfo(incident) {
+            const weather = [];
+            if (incident.weather_clear === 'Y') weather.push('Clear');
+            if (incident.weather_snow === 'Y') weather.push('Snow');
+            if (incident.weather_cloudy === 'Y') weather.push('Cloudy');
+            if (incident.weather_fog_smoke === 'Y') weather.push('Fog/Smoke');
+            if (incident.weather_rain === 'Y') weather.push('Rain');
+            if (incident.weather_severe_wind === 'Y') weather.push('Severe Wind');
+            if (incident.weather_other === 'Y') weather.push(`Other: ${incident.weather_other_text || ''}`);
+            if (incident.weather_unknown === 'Y') weather.push('Unknown');
+            
+            document.getElementById('weatherInfo').innerHTML = weather.length > 0 ? weather.join(', ') : 'N/A';
+        }
+
+        function populateContactAreas(incident) {
+            const svAreas = [];
+            const cpAreas = [];
+            
+            // Subject Vehicle contact areas
+            const svContactFields = [
+                'sv_contact_area_rear_left', 'sv_contact_area_left', 'sv_contact_area_front_left',
+                'sv_contact_area_rear', 'sv_contact_area_top', 'sv_contact_area_front',
+                'sv_contact_area_rear_right', 'sv_contact_area_right', 'sv_contact_area_front_right',
+                'sv_contact_area_bottom', 'sv_contact_area_unknown'
+            ];
+            
+            svContactFields.forEach(field => {
+                if (incident[field] === 'Y') {
+                    svAreas.push(field.replace('sv_contact_area_', '').replace(/_/g, ' '));
+                }
+            });
+            
+            // Crash Partner contact areas
+            const cpContactFields = [
+                'cp_contact_area_rear_left', 'cp_contact_area_left', 'cp_contact_area_front_left',
+                'cp_contact_area_rear', 'cp_contact_area_top', 'cp_contact_area_front',
+                'cp_contact_area_rear_right', 'cp_contact_area_right', 'cp_contact_area_front_right',
+                'cp_contact_area_bottom', 'cp_contact_area_unknown'
+            ];
+            
+            cpContactFields.forEach(field => {
+                if (incident[field] === 'Y') {
+                    cpAreas.push(field.replace('cp_contact_area_', '').replace(/_/g, ' '));
+                }
+            });
+            
+            document.getElementById('svContactAreas').textContent = svAreas.length > 0 ? svAreas.join(', ') : 'N/A';
+            document.getElementById('cpContactAreas').textContent = cpAreas.length > 0 ? cpAreas.join(', ') : 'N/A';
+        }
+
+        function populateDataAvailability(incident) {
+            const dataTypes = [];
+            if (incident.data_availability_edr === 'Y') dataTypes.push('EDR');
+            if (incident.data_availability_police_rpt === 'Y') dataTypes.push('Police Report');
+            if (incident.data_availability_telematics === 'Y') dataTypes.push('Telematics');
+            if (incident.data_availability_complaints === 'Y') dataTypes.push('Complaints');
+            if (incident.data_availability_video === 'Y') dataTypes.push('Video');
+            if (incident.data_availability_other === 'Y') dataTypes.push('Other');
+            if (incident.data_availability_no_data === 'Y') dataTypes.push('No Data');
+            if (incident.data_availability_unknown === 'Y') dataTypes.push('Unknown');
+            
+            document.getElementById('dataAvailability').innerHTML = dataTypes.length > 0 ? dataTypes.join(', ') : 'N/A';
+        }
+
+        function populateAllData(incident) {
+            const tbody = document.getElementById('allDataBody');
+            tbody.innerHTML = '';
+            
+            Object.entries(incident).forEach(([key, value]) => {
+                const row = document.createElement('tr');
+                const fieldCell = document.createElement('td');
+                const valueCell = document.createElement('td');
+                
+                fieldCell.textContent = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                valueCell.textContent = value || 'N/A';
+                valueCell.style.wordBreak = 'break-word';
+                
+                row.appendChild(fieldCell);
+                row.appendChild(valueCell);
+                tbody.appendChild(row);
+            });
+        }
+    </script>
+</body>
+</html>

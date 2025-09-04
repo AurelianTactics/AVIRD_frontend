@@ -61,7 +61,14 @@
                     html += '<tr>';
                     columns.forEach(col => {
                         const value = row[col] || '';
-                        html += `<td class="text-nowrap" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${value}</td>`;
+                        // Make report_id clickable
+                        if (col === 'report_id' && value) {
+                            html += `<td class="text-nowrap" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">
+                                <a href="/incident/${value}" class="text-decoration-none">${value}</a>
+                            </td>`;
+                        } else {
+                            html += `<td class="text-nowrap" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${value}</td>`;
+                        }
                     });
                     html += '</tr>';
                 });

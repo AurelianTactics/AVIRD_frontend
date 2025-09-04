@@ -3,7 +3,10 @@
     "allow": [
       "Bash(uvicorn:*)",
       "Bash(mkdir:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Read(C:\\Users\\james\\github_repos\\autonomous-information-crash-analysis-reports\\src\\frontend\\src\\pages/**)",
+      "Read(C:\\Users\\james\\github_repos\\autonomous-information-crash-analysis-reports\\src\\frontend\\src\\pages/**)",
+      "Read(C:\\Users\\james\\github_repos\\autonomous-information-crash-analysis-reports\\src\\frontend\\src\\pages/**)"
     ],
     "deny": []
   }

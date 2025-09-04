@@ -129,6 +129,64 @@ async def get_entity_stats():
     except Exception as e:
         return {"error": str(e)}
 
+@app.get("/incident/{report_id}", response_class=HTMLResponse)
+async def incident_page(request: Request, report_id: str):
+    return templates.TemplateResponse("incident.html", {"request": request, "report_id": report_id})
+
+@app.get("/api/incident/{report_id}")
+async def get_incident_detail(report_id: str):
+    try:
+        with engine.connect() as conn:
+            # Get all columns dynamically
+            if "sqlite" in str(engine.url):
+                columns_result = conn.execute(text("PRAGMA table_info(incident_reports)"))
+                columns = [row[1] for row in columns_result.fetchall()]
+            else:
+                # PostgreSQL
+                columns_result = conn.execute(text("""
+                    SELECT column_name 
+                    FROM information_schema.columns 
+                    WHERE table_name = 'incident_reports'
+                    ORDER BY ordinal_position
+                """))
+                columns = [row[0] for row in columns_result.fetchall()]
+            
+            # Query for specific incident
+            query = text(f"SELECT * FROM incident_reports WHERE report_id = :report_id")
+            result = conn.execute(query, {"report_id": report_id})
+            
+            row = result.fetchone()
+            if not row:
+                return {"error": f"Incident with report ID {report_id} not found"}
+            
+            # Convert to dict
+            incident_data = dict(zip(columns, row))
+            
+            return {
+                "incident": incident_data,
+                "columns": columns
+            }
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/api/incidents/same/{same_incident_id}")
+async def get_same_incidents(same_incident_id: str):
+    try:
+        with engine.connect() as conn:
+            query = text("SELECT report_id, same_incident_id FROM incident_reports WHERE same_incident_id = :same_incident_id")
+            result = conn.execute(query, {"same_incident_id": same_incident_id})
+            
+            incidents = []
+            for row in result:
+                incidents.append({
+                    "report_id": row[0],
+                    "same_incident_id": row[1]
+                })
+            
+            return {"incidents": incidents}
+    except Exception as e:
+        return {"error": str(e)}
+
 @app.get("/test")
 async def test_endpoint():
     return {"message": "FastAPI is working!"}
