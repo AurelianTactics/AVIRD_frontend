@@ -71,4 +71,7 @@ stretch ideas
 		connect to existing or external MCP
 
     using google maps API to pull in more information on the incident sites and surrounding areas
+
+    meta analysis of fault
+        differing LLM versions and fault explanations
 	
