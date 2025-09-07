@@ -1,9 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(avird_env/Scripts/python.exe -c \"\nimport os\nprint(''OPENAI_API_KEY set:'', bool(os.environ.get(''OPENAI_API_KEY'')))\nprint(''LANGSMITH_API_KEY set:'', bool(os.environ.get(''LANGSMITH_API_KEY'')))\n\")",
-      "Bash(avird_env/Scripts/pip.exe install python-dotenv==1.0.0)",
-      "Bash(avird_env/Scripts/python.exe -c \"\nfrom sqlalchemy import create_engine, text\nimport os\n\n# Use local SQLite database\ndb_url = ''sqlite:///./avird_data.db''\nengine = create_engine(db_url)\n\nwith engine.connect() as conn:\n    result = conn.execute(text(''SELECT COUNT(*) FROM fault_analysis''))\n    count = result.fetchone()[0]\n    print(f''Total fault analysis records: {count}'')\n    \n    # Show some sample records\n    sample = conn.execute(text(''SELECT report_id, fault_version, is_av_at_fault, av_fault_percentage FROM fault_analysis LIMIT 5''))\n    print(''\\nSample records:'')\n    for row in sample:\n        print(f''  Report ID: {row[0]}, Version: {row[1]}, AV at fault: {row[2]}, Fault %: {row[3]}'')\n\")"
+      "Bash(sqlite3:*)",
+      "Bash(avird_envScriptsactivate)",
+      "Bash(avird_env\\Scripts\\activate)",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": []

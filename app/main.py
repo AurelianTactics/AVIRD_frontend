@@ -1,18 +1,48 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from starlette.middleware.base import BaseHTTPMiddleware
 from .database import engine
 from sqlalchemy import text
 import os
 
 app = FastAPI(title="AVIRD Data Analyzer")
 
+# Security headers middleware
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        return response
+
+app.add_middleware(SecurityHeadersMiddleware)
+
+# Environment configuration
+DEBUG = os.getenv("ENVIRONMENT", "development") == "development"
+
 # Only mount static files if directory exists
 if os.path.exists("static"):
     app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
+
+# Serve robots.txt
+@app.get("/robots.txt")
+async def robots_txt():
+    return HTMLResponse(content="""User-agent: *
+Disallow: /
+
+# This is a research prototype
+# No crawling or indexing allowed""", media_type="text/plain")
+
+# 404 Error handler
+@app.exception_handler(404)
+async def not_found_handler(request: Request, exc: HTTPException):
+    return templates.TemplateResponse("404.html", {"request": request}, status_code=404)
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
@@ -162,9 +192,35 @@ async def get_incident_detail(report_id: str):
             # Convert to dict
             incident_data = dict(zip(columns, row))
             
+            # Get fault analysis data if available
+            fault_data = None
+            try:
+                fault_query = text("""
+                    SELECT fault_version, is_av_at_fault, av_fault_percentage, short_explanation_of_decision, created_at
+                    FROM fault_analysis 
+                    WHERE report_id = :report_id 
+                    ORDER BY created_at DESC 
+                    LIMIT 1
+                """)
+                fault_result = conn.execute(fault_query, {"report_id": report_id})
+                fault_row = fault_result.fetchone()
+                
+                if fault_row:
+                    fault_data = {
+                        "fault_version": fault_row[0],
+                        "is_av_at_fault": fault_row[1],
+                        "av_fault_percentage": fault_row[2],
+                        "short_explanation_of_decision": fault_row[3],
+                        "created_at": fault_row[4]
+                    }
+            except Exception as fault_error:
+                # If fault table doesn't exist or other error, continue without fault data
+                print(f"Could not fetch fault data: {fault_error}")
+            
             return {
                 "incident": incident_data,
-                "columns": columns
+                "columns": columns,
+                "fault_analysis": fault_data
             }
     except Exception as e:
         return {"error": str(e)}

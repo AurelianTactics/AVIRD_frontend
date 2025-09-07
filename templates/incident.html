@@ -157,6 +157,11 @@
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="fault-analysis-tab" data-bs-toggle="tab" data-bs-target="#fault-analysis" type="button" role="tab">
+                        Fault Analysis
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
                     <button class="nav-link" id="all-data-tab" data-bs-toggle="tab" data-bs-target="#all-data" type="button" role="tab">
                         All Data
                     </button>
@@ -266,6 +271,69 @@
                     </div>
                 </div>
 
+                <!-- Fault Analysis Tab -->
+                <div class="tab-pane fade" id="fault-analysis" role="tabpanel">
+                    <div id="faultAnalysisContent">
+                        <div id="noFaultData" class="alert alert-info" style="display: none;">
+                            <h6>No Fault Analysis Available</h6>
+                            <p>No fault analysis has been performed for this incident yet.</p>
+                        </div>
+                        
+                        <div id="faultDataSection" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="info-card">
+                                        <h6>AI Fault Assessment</h6>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <div class="field-value">
+                                                    <span class="field-label">AV At Fault:</span> 
+                                                    <span id="faultStatus" class="badge"></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="field-value">
+                                                    <span class="field-label">Fault Percentage:</span> 
+                                                    <span id="faultPercentage"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <h7 class="field-label">Analysis Explanation:</h7>
+                                            <div id="faultExplanation" class="mt-2 p-3" style="background-color: #f8f9fa; border-radius: 5px; border-left: 4px solid #007bff;"></div>
+                                        </div>
+                                        
+                                        <div class="row text-muted small">
+                                            <div class="col-md-6">
+                                                <span class="field-label">Analysis Version:</span> <span id="faultVersion"></span>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <span class="field-label">Generated:</span> <span id="faultCreatedAt"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="info-card">
+                                        <h6>About This Analysis</h6>
+                                        <p class="small text-muted">
+                                            This fault analysis was generated using AI for entertainment purposes only.
+                                            The analysis considers the narrative.
+                                        </p>
+                                        <p class="small text-muted">
+                                            <strong>Note:</strong> This is an automated assessment for entertainment purposes only.
+                                            Analysis should not be used as the sole basis for legal or 
+                                            insurance decisions.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- All Data Tab -->
                 <div class="tab-pane fade" id="all-data" role="tabpanel">
                     <div class="table-responsive">
@@ -305,7 +373,9 @@
                 }
 
                 const incident = result.incident;
+                const faultAnalysis = result.fault_analysis;
                 populateIncidentData(incident);
+                populateFaultAnalysis(faultAnalysis);
                 
                 // Hide loading, show content
                 document.getElementById('loading').style.display = 'none';
@@ -490,6 +560,76 @@
                 tbody.appendChild(row);
             });
         }
+
+        function populateFaultAnalysis(faultData) {
+            if (!faultData) {
+                // Show "no fault data" message
+                document.getElementById('noFaultData').style.display = 'block';
+                document.getElementById('faultDataSection').style.display = 'none';
+                return;
+            }
+
+            // Show fault data section and hide "no data" message
+            document.getElementById('faultDataSection').style.display = 'block';
+            document.getElementById('noFaultData').style.display = 'none';
+
+            // Populate fault status with appropriate styling
+            const faultStatusElement = document.getElementById('faultStatus');
+            if (faultData.is_av_at_fault === true || faultData.is_av_at_fault === 1) {
+                faultStatusElement.textContent = 'Yes';
+                faultStatusElement.className = 'badge bg-danger';
+            } else if (faultData.is_av_at_fault === false || faultData.is_av_at_fault === 0) {
+                faultStatusElement.textContent = 'No';
+                faultStatusElement.className = 'badge bg-success';
+            } else {
+                faultStatusElement.textContent = 'Unknown';
+                faultStatusElement.className = 'badge bg-secondary';
+            }
+
+            // Populate fault percentage
+            const percentageElement = document.getElementById('faultPercentage');
+            if (faultData.av_fault_percentage !== null && faultData.av_fault_percentage !== undefined) {
+                const percentage = Math.round(faultData.av_fault_percentage * 100);
+                percentageElement.textContent = `${percentage}%`;
+                
+                // Color code the percentage
+                if (percentage >= 75) {
+                    percentageElement.style.color = '#dc3545'; // Red
+                    percentageElement.style.fontWeight = 'bold';
+                } else if (percentage >= 50) {
+                    percentageElement.style.color = '#fd7e14'; // Orange
+                    percentageElement.style.fontWeight = 'bold';
+                } else if (percentage >= 25) {
+                    percentageElement.style.color = '#ffc107'; // Yellow
+                } else {
+                    percentageElement.style.color = '#28a745'; // Green
+                }
+            } else {
+                percentageElement.textContent = 'N/A';
+                percentageElement.style.color = '#6c757d';
+            }
+
+            // Populate explanation
+            document.getElementById('faultExplanation').textContent = 
+                faultData.short_explanation_of_decision || 'No explanation provided.';
+
+            // Populate metadata
+            document.getElementById('faultVersion').textContent = faultData.fault_version || 'N/A';
+            
+            // Format the created_at timestamp
+            if (faultData.created_at) {
+                const date = new Date(faultData.created_at);
+                document.getElementById('faultCreatedAt').textContent = date.toLocaleString();
+            } else {
+                document.getElementById('faultCreatedAt').textContent = 'N/A';
+            }
+        }
     </script>
+
+    <footer class="footer mt-5 py-4 text-center bg-light">
+        <div class="container">
+            <span class="text-muted">© 2025 AVIRD Data Analyzer. For research purposes only.</span>
+        </div>
+    </footer>
 </body>
 </html>

@@ -79,7 +79,6 @@ Uses SQLite database (`avird_data.db`) for simple local development without exte
 
 ### Key Files for Deployment
 - **`requirements.txt`**: Python dependencies (FastAPI, SQLAlchemy, PostgreSQL driver, etc.)
-- **`Procfile`**: Heroku-style process definition
 - **`railway.json`**: Railway-specific deployment configuration
 - **`start.sh`**: Production startup script
 - do not be a sycophant

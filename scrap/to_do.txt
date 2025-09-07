@@ -1,58 +1,14 @@
 # rough notes on possible directions to take this mini project
 
-Working
-
-
-To do
-    more basic webpages
-        DONE entities
-        contact
-        DONE incident
-
-    DONE deply prototype
-
-    then the agentic
-        basic fault
-        interaticve fault
-
-
-stretch
-    waymo data
-    regular pull and update (avird backend)
 
 Backlog
-	DONE protopype local works with postgres
+    pull in waymo data
+    pull in more data sources
 
-
-Ideas
-    use the pdf and data explnation summaries for context
-
-
-MVP website
-
-    DONE one time load
-        NHTSA data set
-        waymo dataset
-        initialize the DB
-        postgress
-
-    DONE Prototype website that display one page
-
-    something agentic
-        feedback into issue
-        issue comes with plan
-
-    my basic ideas
-        DONE use git trees for this
-        see the other pages
-        my waymo plus data on to the pages
-
-    doing a regular cronjob pull
-        own repo?
-
-
-stretch ideas
+    more agentic ideas (see otehr notes)
     better front end?
+
+    regular cronjob update of data
 
 	something agentic that creates a page or analysis or view based on user input
         user input to issue
@@ -74,4 +30,8 @@ stretch ideas
 
     meta analysis of fault
         differing LLM versions and fault explanations
+
+    use the pdf and data explnation summaries for context
+
+    see spreadsheet and .txt for other notes
 	
