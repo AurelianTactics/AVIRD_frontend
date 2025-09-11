@@ -50,6 +50,7 @@ def run_get_fault(argparse_args):
     # setup
     _set_env("OPENAI_API_KEY")
     _set_env("LANGSMITH_API_KEY")
+    _set_env("DATABASE_PUBLIC_URL")
 
     # Disable LangSmith tracing for now to avoid API errors
     os.environ["LANGCHAIN_TRACING_V2"] = "false"
