@@ -3,7 +3,9 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.base import BaseHTTPMiddleware
+from pydantic import BaseModel
 from .database import engine
+from .fault_analysis import create_session, process_user_argument, get_session_state, end_session
 from sqlalchemy import text
 import os
 
@@ -29,6 +31,13 @@ if os.path.exists("static"):
     app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
+
+# Pydantic models for request/response
+class StartSessionRequest(BaseModel):
+    user_position: str  # "prosecution" or "defense"
+
+class ArgumentRequest(BaseModel):
+    argument: str
 
 # Serve robots.txt
 @app.get("/robots.txt")
@@ -246,3 +255,111 @@ async def get_same_incidents(same_incident_id: str):
 @app.get("/test")
 async def test_endpoint():
     return {"message": "FastAPI is working!"}
+
+# Interactive Fault Analysis Endpoints
+
+@app.post("/api/incident/{report_id}/interactive-fault")
+async def start_interactive_fault_session(report_id: str, request: StartSessionRequest):
+    """Start a new interactive fault analysis session"""
+    try:
+        # Validate position
+        if request.user_position.lower() not in ["prosecution", "defense"]:
+            raise HTTPException(status_code=400, detail="Position must be 'prosecution' or 'defense'")
+        
+        # Get incident data
+        with engine.connect() as conn:
+            # Get all columns dynamically
+            if "sqlite" in str(engine.url):
+                columns_result = conn.execute(text("PRAGMA table_info(incident_reports)"))
+                columns = [row[1] for row in columns_result.fetchall()]
+            else:
+                # PostgreSQL
+                columns_result = conn.execute(text("""
+                    SELECT column_name 
+                    FROM information_schema.columns 
+                    WHERE table_name = 'incident_reports'
+                    ORDER BY ordinal_position
+                """))
+                columns = [row[0] for row in columns_result.fetchall()]
+            
+            # Query for specific incident
+            query = text(f"SELECT * FROM incident_reports WHERE report_id = :report_id")
+            result = conn.execute(query, {"report_id": report_id})
+            
+            row = result.fetchone()
+            if not row:
+                raise HTTPException(status_code=404, detail=f"Incident with report ID {report_id} not found")
+            
+            # Convert to dict
+            incident_data = dict(zip(columns, row))
+        
+        # Create session
+        session_id = create_session(report_id, incident_data, request.user_position)
+        
+        return {
+            "success": True,
+            "session_id": session_id,
+            "user_position": request.user_position,
+            "ai_position": "defense" if request.user_position.lower() == "prosecution" else "prosecution"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/incident/{report_id}/interactive-fault/{session_id}/argue")
+async def submit_argument(report_id: str, session_id: str, request: ArgumentRequest):
+    """Submit user argument and get AI response"""
+    try:
+        # Validate argument length
+        if not request.argument or len(request.argument.strip()) == 0:
+            raise HTTPException(status_code=400, detail="Argument cannot be empty")
+        
+        if len(request.argument) > 1000:
+            raise HTTPException(status_code=400, detail="Argument too long (max 1000 characters)")
+        
+        # Process argument
+        result = process_user_argument(session_id, request.argument)
+        
+        if not result.get("success"):
+            raise HTTPException(status_code=400, detail=result.get("error", "Failed to process argument"))
+        
+        return result
+        
+    except HTTPException:
+        raise
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/incident/{report_id}/interactive-fault/{session_id}")
+async def get_session_status(report_id: str, session_id: str):
+    """Get current session state"""
+    try:
+        session_state = get_session_state(session_id)
+        return session_state
+        
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/incident/{report_id}/interactive-fault/{session_id}/end")
+async def end_fault_session(report_id: str, session_id: str):
+    """End session and get judge decision"""
+    try:
+        result = end_session(session_id)
+        
+        if not result.get("success", True):
+            raise HTTPException(status_code=400, detail=result.get("error", "Failed to end session"))
+        
+        return result
+        
+    except HTTPException:
+        raise
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

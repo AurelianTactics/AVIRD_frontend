@@ -4,7 +4,12 @@
       "Bash(sqlite3:*)",
       "Bash(avird_envScriptsactivate)",
       "Bash(avird_env\\Scripts\\activate)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(findstr:*)",
+      "Bash(\"avird_env\\Scripts\\activate\")",
+      "Bash(dir)",
+      "Bash(uvicorn:*)",
+      "Bash(\"avird_env/Scripts/python.exe\" -m uvicorn app.main:app --reload)"
     ],
     "deny": [],
     "ask": []

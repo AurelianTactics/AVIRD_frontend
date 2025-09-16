@@ -162,6 +162,11 @@
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="interactive-fault-tab" data-bs-toggle="tab" data-bs-target="#interactive-fault" type="button" role="tab">
+                        Interactive Fault Analysis
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
                     <button class="nav-link" id="all-data-tab" data-bs-toggle="tab" data-bs-target="#all-data" type="button" role="tab">
                         All Data
                     </button>
@@ -330,6 +335,129 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Fault Analysis Tab -->
+                <div class="tab-pane fade" id="interactive-fault" role="tabpanel">
+                    <div id="interactiveFaultContent">
+                        <!-- Session Start Section -->
+                        <div id="sessionStartSection" class="info-card">
+                            <h6>Start Interactive Fault Analysis</h6>
+                            <p class="text-muted small">
+                                Argue whether the autonomous vehicle is at fault. An AI will argue the opposite position, 
+                                and an AI judge will make the final decision.
+                            </p>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Choose Your Position:</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="userPosition" id="prosecutionRadio" value="prosecution">
+                                        <label class="form-check-label" for="prosecutionRadio">
+                                            <strong>Prosecution</strong> - Argue the AV is at fault
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="userPosition" id="defenseRadio" value="defense">
+                                        <label class="form-check-label" for="defenseRadio">
+                                            <strong>Defense</strong> - Argue the AV is not at fault
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button id="startSessionBtn" class="btn btn-primary" disabled>
+                                Start Analysis Session
+                            </button>
+                        </div>
+                        
+                        <!-- Active Session Section -->
+                        <div id="activeSessionSection" class="info-card" style="display: none;">
+                            <div class="row mb-3">
+                                <div class="col-md-8">
+                                    <h6>Interactive Fault Analysis Session</h6>
+                                    <div id="sessionInfo" class="text-muted small"></div>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <button id="endSessionBtn" class="btn btn-warning btn-sm">End & Judge</button>
+                                    <button id="newSessionBtn" class="btn btn-secondary btn-sm">New Session</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Conversation Display -->
+                            <div id="conversationContainer" class="mb-3" style="max-height: 400px; overflow-y: auto; border: 1px solid #e9ecef; border-radius: 5px; padding: 15px;">
+                                <div id="conversationHistory"></div>
+                            </div>
+                            
+                            <!-- Argument Input -->
+                            <div id="argumentInputSection">
+                                <div class="mb-3">
+                                    <label for="argumentText" class="form-label">Your Argument:</label>
+                                    <textarea id="argumentText" class="form-control" rows="4" maxlength="1000" 
+                                        placeholder="Enter your argument here (max 1000 characters)..."></textarea>
+                                    <div class="form-text">
+                                        <span id="charCount">0</span>/1000 characters
+                                    </div>
+                                </div>
+                                <button id="submitArgumentBtn" class="btn btn-primary">Submit Argument</button>
+                                <button id="goToJudgeBtn" class="btn btn-success ms-2">Go to Judge</button>
+                            </div>
+                            
+                            <!-- Loading State -->
+                            <div id="processingState" class="text-center py-3" style="display: none;">
+                                <div class="spinner-border spinner-border-sm" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <span class="ms-2">Processing your argument...</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Final Decision Section -->
+                        <div id="finalDecisionSection" class="info-card" style="display: none;">
+                            <h6>Final Decision</h6>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="mb-3">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="field-value">
+                                                    <span class="field-label">AV At Fault:</span> 
+                                                    <span id="finalFaultStatus" class="badge"></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="field-value">
+                                                    <span class="field-label">Fault Percentage:</span> 
+                                                    <span id="finalFaultPercentage"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <span class="field-label">Judge's Reasoning:</span>
+                                        <div id="finalReasoning" class="mt-2 p-3" style="background-color: #f8f9fa; border-radius: 5px; border-left: 4px solid #28a745;"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="info-card" style="background-color: #f8f9fa;">
+                                        <h7>Session Complete</h7>
+                                        <p class="small text-muted mb-2">
+                                            This interactive analysis was generated for entertainment purposes.
+                                        </p>
+                                        <button id="startNewAnalysis" class="btn btn-primary btn-sm">Start New Analysis</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Error Display -->
+                        <div id="interactiveFaultError" class="alert alert-danger" style="display: none;">
+                            <h6>Error</h6>
+                            <p id="interactiveFaultErrorMessage"></p>
                         </div>
                     </div>
                 </div>
@@ -624,6 +752,306 @@
                 document.getElementById('faultCreatedAt').textContent = 'N/A';
             }
         }
+
+        // Interactive Fault Analysis functionality
+        let currentSessionId = null;
+        let currentUserPosition = null;
+
+        function initializeInteractiveFault() {
+            // Position radio change handler
+            document.querySelectorAll('input[name="userPosition"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    document.getElementById('startSessionBtn').disabled = false;
+                });
+            });
+
+            // Character counter for argument
+            const argumentText = document.getElementById('argumentText');
+            const charCount = document.getElementById('charCount');
+            
+            argumentText.addEventListener('input', function() {
+                const count = this.value.length;
+                charCount.textContent = count;
+                
+                // Color coding
+                if (count > 800) {
+                    charCount.style.color = '#dc3545'; // Red
+                } else if (count > 600) {
+                    charCount.style.color = '#ffc107'; // Yellow
+                } else {
+                    charCount.style.color = '#6c757d'; // Grey
+                }
+            });
+
+            // Event listeners for buttons
+            document.getElementById('startSessionBtn').addEventListener('click', startNewSession);
+            document.getElementById('submitArgumentBtn').addEventListener('click', submitArgument);
+            document.getElementById('goToJudgeBtn').addEventListener('click', goToJudge);
+            document.getElementById('endSessionBtn').addEventListener('click', endSession);
+            document.getElementById('newSessionBtn').addEventListener('click', resetToStart);
+            document.getElementById('startNewAnalysis').addEventListener('click', resetToStart);
+        }
+
+        async function startNewSession() {
+            const selectedPosition = document.querySelector('input[name="userPosition"]:checked');
+            if (!selectedPosition) {
+                showInteractiveFaultError('Please select a position (Prosecution or Defense)');
+                return;
+            }
+
+            currentUserPosition = selectedPosition.value;
+            const reportId = "{{ report_id }}";
+
+            try {
+                showProcessing(true);
+                
+                const response = await fetch(`/api/incident/${reportId}/interactive-fault`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_position: currentUserPosition
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    currentSessionId = result.session_id;
+                    showActiveSession();
+                    updateSessionInfo(result);
+                } else {
+                    showInteractiveFaultError(result.detail || 'Failed to start session');
+                }
+            } catch (error) {
+                showInteractiveFaultError('Network error: ' + error.message);
+            } finally {
+                showProcessing(false);
+            }
+        }
+
+        async function submitArgument() {
+            const argumentText = document.getElementById('argumentText').value.trim();
+            
+            if (!argumentText) {
+                showInteractiveFaultError('Please enter an argument');
+                return;
+            }
+
+            if (!currentSessionId) {
+                showInteractiveFaultError('No active session');
+                return;
+            }
+
+            const reportId = "{{ report_id }}";
+
+            try {
+                showProcessing(true);
+                document.getElementById('submitArgumentBtn').disabled = true;
+                
+                const response = await fetch(`/api/incident/${reportId}/interactive-fault/${currentSessionId}/argue`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        argument: argumentText
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    updateConversationDisplay(result);
+                    document.getElementById('argumentText').value = '';
+                    document.getElementById('charCount').textContent = '0';
+                    
+                    // Check if session is complete
+                    if (result.status === 'judged') {
+                        showFinalDecision(result.final_decision);
+                    }
+                } else {
+                    showInteractiveFaultError(result.detail || 'Failed to process argument');
+                }
+            } catch (error) {
+                showInteractiveFaultError('Network error: ' + error.message);
+            } finally {
+                showProcessing(false);
+                document.getElementById('submitArgumentBtn').disabled = false;
+            }
+        }
+
+        async function goToJudge() {
+            if (!currentSessionId) {
+                showInteractiveFaultError('No active session');
+                return;
+            }
+
+            const reportId = "{{ report_id }}";
+
+            try {
+                showProcessing(true);
+                
+                const response = await fetch(`/api/incident/${reportId}/interactive-fault/${currentSessionId}/end`, {
+                    method: 'POST'
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    updateConversationDisplay(result);
+                    if (result.final_decision) {
+                        showFinalDecision(result.final_decision);
+                    }
+                } else {
+                    showInteractiveFaultError(result.detail || 'Failed to get judge decision');
+                }
+            } catch (error) {
+                showInteractiveFaultError('Network error: ' + error.message);
+            } finally {
+                showProcessing(false);
+            }
+        }
+
+        function endSession() {
+            goToJudge(); // Same as going to judge
+        }
+
+        function resetToStart() {
+            currentSessionId = null;
+            currentUserPosition = null;
+            
+            // Reset UI
+            document.getElementById('sessionStartSection').style.display = 'block';
+            document.getElementById('activeSessionSection').style.display = 'none';
+            document.getElementById('finalDecisionSection').style.display = 'none';
+            document.getElementById('interactiveFaultError').style.display = 'none';
+            
+            // Reset form
+            document.querySelectorAll('input[name="userPosition"]').forEach(radio => {
+                radio.checked = false;
+            });
+            document.getElementById('startSessionBtn').disabled = true;
+            document.getElementById('argumentText').value = '';
+            document.getElementById('charCount').textContent = '0';
+            document.getElementById('conversationHistory').innerHTML = '';
+        }
+
+        function showActiveSession() {
+            document.getElementById('sessionStartSection').style.display = 'none';
+            document.getElementById('activeSessionSection').style.display = 'block';
+            document.getElementById('finalDecisionSection').style.display = 'none';
+            document.getElementById('interactiveFaultError').style.display = 'none';
+        }
+
+        function updateSessionInfo(sessionData) {
+            const userPos = currentUserPosition.charAt(0).toUpperCase() + currentUserPosition.slice(1);
+            const aiPos = sessionData.ai_position.charAt(0).toUpperCase() + sessionData.ai_position.slice(1);
+            
+            document.getElementById('sessionInfo').innerHTML = `
+                <strong>Your Position:</strong> ${userPos} | 
+                <strong>AI Position:</strong> ${aiPos} | 
+                <strong>Round:</strong> <span id="roundCounter">1</span>/3
+            `;
+        }
+
+        function updateConversationDisplay(sessionData) {
+            const conversationHistory = document.getElementById('conversationHistory');
+            conversationHistory.innerHTML = '';
+            
+            if (sessionData.messages && sessionData.messages.length > 0) {
+                sessionData.messages.forEach((message, index) => {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'mb-3 p-3 rounded';
+                    
+                    let role = message.role;
+                    let bgColor = '#f8f9fa';
+                    let textColor = '#000';
+                    let speaker = 'Unknown';
+                    
+                    if (role === 'human') {
+                        speaker = `You (${currentUserPosition.charAt(0).toUpperCase() + currentUserPosition.slice(1)})`;
+                        bgColor = '#e7f3ff';
+                        textColor = '#0056b3';
+                    } else if (role === 'ai_advocate') {
+                        const aiPosition = currentUserPosition === 'prosecution' ? 'Defense' : 'Prosecution';
+                        speaker = `AI Advocate (${aiPosition})`;
+                        bgColor = '#fff3cd';
+                        textColor = '#856404';
+                    } else if (role === 'judge') {
+                        speaker = 'AI Judge';
+                        bgColor = '#d1ecf1';
+                        textColor = '#0c5460';
+                    }
+                    
+                    messageDiv.style.backgroundColor = bgColor;
+                    messageDiv.style.color = textColor;
+                    messageDiv.style.borderLeft = `4px solid ${textColor}`;
+                    
+                    messageDiv.innerHTML = `
+                        <strong>${speaker}:</strong><br>
+                        ${message.content.replace(/\n/g, '<br>')}
+                    `;
+                    
+                    conversationHistory.appendChild(messageDiv);
+                });
+                
+                // Scroll to bottom
+                document.getElementById('conversationContainer').scrollTop = 
+                    document.getElementById('conversationContainer').scrollHeight;
+            }
+            
+            // Update round counter
+            const roundCounterEl = document.getElementById('roundCounter');
+            if (roundCounterEl && sessionData.round_count) {
+                roundCounterEl.textContent = sessionData.round_count;
+            }
+        }
+
+        function showFinalDecision(decision) {
+            document.getElementById('activeSessionSection').style.display = 'none';
+            document.getElementById('finalDecisionSection').style.display = 'block';
+            
+            // Populate decision data
+            const statusElement = document.getElementById('finalFaultStatus');
+            if (decision.fault_status === 'Yes') {
+                statusElement.textContent = 'Yes';
+                statusElement.className = 'badge bg-danger';
+            } else if (decision.fault_status === 'No') {
+                statusElement.textContent = 'No';
+                statusElement.className = 'badge bg-success';
+            } else {
+                statusElement.textContent = 'Unknown';
+                statusElement.className = 'badge bg-secondary';
+            }
+            
+            document.getElementById('finalFaultPercentage').textContent = `${decision.fault_percentage}%`;
+            document.getElementById('finalReasoning').textContent = decision.reasoning || decision.full_response;
+        }
+
+        function showInteractiveFaultError(message) {
+            const errorDiv = document.getElementById('interactiveFaultError');
+            const errorMessage = document.getElementById('interactiveFaultErrorMessage');
+            
+            errorMessage.textContent = message;
+            errorDiv.style.display = 'block';
+            
+            // Auto-hide after 10 seconds
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 10000);
+        }
+
+        function showProcessing(show) {
+            document.getElementById('processingState').style.display = show ? 'block' : 'none';
+            document.getElementById('argumentInputSection').style.display = show ? 'none' : 'block';
+        }
+
+        // Initialize interactive fault analysis when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeInteractiveFault();
+        });
     </script>
 
     <footer class="footer mt-5 py-4 text-center bg-light">
