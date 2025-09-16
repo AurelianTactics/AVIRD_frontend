@@ -34,4 +34,8 @@ Backlog
     use the pdf and data explnation summaries for context
 
     see spreadsheet and .txt for other notes
+
+    interactive fautla nalysis can be tested more thoroughly and look better
+    
+    website can obviously look better
 	

@@ -279,6 +279,47 @@
                 <!-- Fault Analysis Tab -->
                 <div class="tab-pane fade" id="fault-analysis" role="tabpanel">
                     <div id="faultAnalysisContent">
+                        <!-- Incident Details for Fault Analysis -->
+                        <div class="info-card mb-3" style="background-color: #f8f9fa;">
+                            <h6>Key Incident Details Used for Analysis</h6>
+                            <p class="small text-muted mb-2">These are the primary details used for fault analysis:</p>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div id="faultAnalysisNarrativeSection" style="display: none;">
+                                        <div class="mb-2">
+                                            <strong>Incident Narrative:</strong>
+                                            <div id="faultAnalysisNarrativeText" class="mt-1 p-2" style="background-color: #ffffff; border-radius: 3px; font-size: 0.9em; max-height: 100px; overflow-y: auto;"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <div class="field-value small"><span class="field-label">Operating Entity:</span> <span id="faultAnalysisOperatingEntity"></span></div>
+                                            <div class="field-value small"><span class="field-label">Date/Time:</span> <span id="faultAnalysisDateTime"></span></div>
+                                            <div class="field-value small"><span class="field-label">Location:</span> <span id="faultAnalysisLocation"></span></div>
+                                            <div class="field-value small"><span class="field-label">Automation Engaged:</span> <span id="faultAnalysisAutomationEngaged"></span></div>
+                                            <div class="field-value small"><span class="field-label">Crash With:</span> <span id="faultAnalysisCrashWith"></span></div>
+                                            <div class="field-value small"><span class="field-label">Injury Severity:</span> <span id="faultAnalysisInjurySeverity"></span></div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="field-value small"><span class="field-label">Vehicle:</span> <span id="faultAnalysisVehicle"></span></div>
+                                            <div class="field-value small"><span class="field-label">AV Pre-Crash Movement:</span> <span id="faultAnalysisAvMovement"></span></div>
+                                            <div class="field-value small"><span class="field-label">AV Speed:</span> <span id="faultAnalysisAvSpeed"></span></div>
+                                            <div class="field-value small"><span class="field-label">Other Vehicle Movement:</span> <span id="faultAnalysisOtherMovement"></span></div>
+                                            <div class="field-value small"><span class="field-label">Roadway Type:</span> <span id="faultAnalysisRoadwayType"></span></div>
+                                            <div class="field-value small"><span class="field-label">Speed Limit:</span> <span id="faultAnalysisSpeedLimit"></span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="field-value small"><span class="field-label">Lighting:</span> <span id="faultAnalysisLighting"></span></div>
+                                    <div class="field-value small"><span class="field-label">Weather:</span> <span id="faultAnalysisWeather"></span></div>
+                                    <div class="field-value small"><span class="field-label">Property Damage:</span> <span id="faultAnalysisPropertyDamage"></span></div>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div id="noFaultData" class="alert alert-info" style="display: none;">
                             <h6>No Fault Analysis Available</h6>
                             <p>No fault analysis has been performed for this incident yet.</p>
@@ -383,6 +424,47 @@
                                 <div class="col-md-4 text-end">
                                     <button id="endSessionBtn" class="btn btn-warning btn-sm">End & Judge</button>
                                     <button id="newSessionBtn" class="btn btn-secondary btn-sm">New Session</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Incident Details for Judging -->
+                            <div class="info-card mb-3" style="background-color: #f8f9fa;">
+                                <h6>Key Incident Details Used for Analysis</h6>
+                                <p class="small text-muted mb-2">These are the primary details the AI uses when making arguments and judgments:</p>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div id="faultNarrativeSection" style="display: none;">
+                                            <div class="mb-2">
+                                                <strong>Incident Narrative:</strong>
+                                                <div id="faultNarrativeText" class="mt-1 p-2" style="background-color: #ffffff; border-radius: 3px; font-size: 0.9em; max-height: 100px; overflow-y: auto;"></div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div class="field-value small"><span class="field-label">Operating Entity:</span> <span id="faultOperatingEntity"></span></div>
+                                                <div class="field-value small"><span class="field-label">Date/Time:</span> <span id="faultDateTime"></span></div>
+                                                <div class="field-value small"><span class="field-label">Location:</span> <span id="faultLocation"></span></div>
+                                                <div class="field-value small"><span class="field-label">Automation Engaged:</span> <span id="faultAutomationEngaged"></span></div>
+                                                <div class="field-value small"><span class="field-label">Crash With:</span> <span id="faultCrashWith"></span></div>
+                                                <div class="field-value small"><span class="field-label">Injury Severity:</span> <span id="faultInjurySeverity"></span></div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="field-value small"><span class="field-label">Vehicle:</span> <span id="faultVehicle"></span></div>
+                                                <div class="field-value small"><span class="field-label">AV Pre-Crash Movement:</span> <span id="faultAvMovement"></span></div>
+                                                <div class="field-value small"><span class="field-label">AV Speed:</span> <span id="faultAvSpeed"></span></div>
+                                                <div class="field-value small"><span class="field-label">Other Vehicle Movement:</span> <span id="faultOtherMovement"></span></div>
+                                                <div class="field-value small"><span class="field-label">Roadway Type:</span> <span id="faultRoadwayType"></span></div>
+                                                <div class="field-value small"><span class="field-label">Speed Limit:</span> <span id="faultSpeedLimit"></span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="field-value small"><span class="field-label">Lighting:</span> <span id="faultLighting"></span></div>
+                                        <div class="field-value small"><span class="field-label">Weather:</span> <span id="faultWeather"></span></div>
+                                        <div class="field-value small"><span class="field-label">Property Damage:</span> <span id="faultPropertyDamage"></span></div>
+                                    </div>
                                 </div>
                             </div>
                             
@@ -504,6 +586,7 @@
                 const faultAnalysis = result.fault_analysis;
                 populateIncidentData(incident);
                 populateFaultAnalysis(faultAnalysis);
+                populateFaultAnalysisTabDetails();
                 
                 // Hide loading, show content
                 document.getElementById('loading').style.display = 'none';
@@ -522,6 +605,9 @@
         }
 
         function populateIncidentData(incident) {
+            // Store incident data globally for fault analysis
+            window.incidentData = incident;
+            
             // Header information
             document.getElementById('reportId').textContent = incident.report_id || 'N/A';
             document.getElementById('operatingEntity').textContent = incident.operating_entity || 'N/A';
@@ -869,7 +955,7 @@
                     
                     // Check if session is complete
                     if (result.status === 'judged') {
-                        showFinalDecision(result.final_decision);
+                        showFinalDecision(result.final_decision, result);
                     }
                 } else {
                     showInteractiveFaultError(result.detail || 'Failed to process argument');
@@ -902,7 +988,7 @@
                 if (response.ok) {
                     updateConversationDisplay(result);
                     if (result.final_decision) {
-                        showFinalDecision(result.final_decision);
+                        showFinalDecision(result.final_decision, result);
                     }
                 } else {
                     showInteractiveFaultError(result.detail || 'Failed to get judge decision');
@@ -928,6 +1014,19 @@
             document.getElementById('finalDecisionSection').style.display = 'none';
             document.getElementById('interactiveFaultError').style.display = 'none';
             
+            // Remove final decision banner if it exists
+            const finalDecisionBanner = document.getElementById('finalDecisionBanner');
+            if (finalDecisionBanner) {
+                finalDecisionBanner.remove();
+            }
+            
+            // Reset argument input section visibility
+            document.getElementById('argumentInputSection').style.display = 'block';
+            document.getElementById('goToJudgeBtn').style.display = 'inline-block';
+            document.getElementById('endSessionBtn').style.display = 'inline-block';
+            document.getElementById('newSessionBtn').textContent = 'New Session';
+            document.getElementById('newSessionBtn').className = 'btn btn-secondary btn-sm';
+            
             // Reset form
             document.querySelectorAll('input[name="userPosition"]').forEach(radio => {
                 radio.checked = false;
@@ -943,6 +1042,95 @@
             document.getElementById('activeSessionSection').style.display = 'block';
             document.getElementById('finalDecisionSection').style.display = 'none';
             document.getElementById('interactiveFaultError').style.display = 'none';
+            
+            // Populate the incident details for fault analysis
+            populateFaultAnalysisDetails();
+        }
+        
+        function populateFaultAnalysisDetails() {
+            // Get the incident data that's already loaded on the page
+            const incident = window.incidentData; // We'll need to store this globally
+            if (!incident) return;
+            
+            // Populate narrative
+            if (incident.narrative) {
+                document.getElementById('faultNarrativeSection').style.display = 'block';
+                document.getElementById('faultNarrativeText').textContent = incident.narrative;
+            }
+            
+            // Populate basic details
+            document.getElementById('faultOperatingEntity').textContent = incident.operating_entity || 'N/A';
+            document.getElementById('faultDateTime').textContent = `${incident.incident_date || 'N/A'} ${incident.incident_time_2400 || ''}`.trim();
+            document.getElementById('faultLocation').textContent = `${incident.city || ''}, ${incident.state || ''}`.trim().replace(/^,|,$/, '') || 'N/A';
+            document.getElementById('faultAutomationEngaged').textContent = incident.automation_system_engaged || 'N/A';
+            document.getElementById('faultCrashWith').textContent = incident.crash_with || 'N/A';
+            document.getElementById('faultInjurySeverity').textContent = incident.highest_injury_severity_alleged || 'N/A';
+            
+            // Vehicle info
+            document.getElementById('faultVehicle').textContent = `${incident.make || ''} ${incident.model || ''}`.trim() || 'N/A';
+            document.getElementById('faultAvMovement').textContent = incident.sv_pre_crash_movement || 'N/A';
+            document.getElementById('faultAvSpeed').textContent = incident.sv_precrash_speed_mph ? `${incident.sv_precrash_speed_mph} MPH` : 'N/A';
+            document.getElementById('faultOtherMovement').textContent = incident.cp_pre_crash_movement || 'N/A';
+            document.getElementById('faultRoadwayType').textContent = incident.roadway_type || 'N/A';
+            document.getElementById('faultSpeedLimit').textContent = incident.posted_speed_limit_mph ? `${incident.posted_speed_limit_mph} MPH` : 'N/A';
+            document.getElementById('faultLighting').textContent = incident.lighting || 'N/A';
+            document.getElementById('faultPropertyDamage').textContent = incident.property_damage || 'N/A';
+            
+            // Weather conditions
+            const weather = [];
+            if (incident.weather_clear === 'Y') weather.push('Clear');
+            if (incident.weather_snow === 'Y') weather.push('Snow');
+            if (incident.weather_cloudy === 'Y') weather.push('Cloudy');
+            if (incident.weather_fog_smoke === 'Y') weather.push('Fog/Smoke');
+            if (incident.weather_rain === 'Y') weather.push('Rain');
+            if (incident.weather_severe_wind === 'Y') weather.push('Severe Wind');
+            if (incident.weather_other === 'Y') weather.push(`Other: ${incident.weather_other_text || ''}`);
+            if (incident.weather_unknown === 'Y') weather.push('Unknown');
+            
+            document.getElementById('faultWeather').textContent = weather.length > 0 ? weather.join(', ') : 'N/A';
+        }
+        
+        function populateFaultAnalysisTabDetails() {
+            // Get the incident data that's already loaded on the page
+            const incident = window.incidentData;
+            if (!incident) return;
+            
+            // Populate narrative
+            if (incident.narrative) {
+                document.getElementById('faultAnalysisNarrativeSection').style.display = 'block';
+                document.getElementById('faultAnalysisNarrativeText').textContent = incident.narrative;
+            }
+            
+            // Populate basic details
+            document.getElementById('faultAnalysisOperatingEntity').textContent = incident.operating_entity || 'N/A';
+            document.getElementById('faultAnalysisDateTime').textContent = `${incident.incident_date || 'N/A'} ${incident.incident_time_2400 || ''}`.trim();
+            document.getElementById('faultAnalysisLocation').textContent = `${incident.city || ''}, ${incident.state || ''}`.trim().replace(/^,|,$/, '') || 'N/A';
+            document.getElementById('faultAnalysisAutomationEngaged').textContent = incident.automation_system_engaged || 'N/A';
+            document.getElementById('faultAnalysisCrashWith').textContent = incident.crash_with || 'N/A';
+            document.getElementById('faultAnalysisInjurySeverity').textContent = incident.highest_injury_severity_alleged || 'N/A';
+            
+            // Vehicle info
+            document.getElementById('faultAnalysisVehicle').textContent = `${incident.make || ''} ${incident.model || ''}`.trim() || 'N/A';
+            document.getElementById('faultAnalysisAvMovement').textContent = incident.sv_pre_crash_movement || 'N/A';
+            document.getElementById('faultAnalysisAvSpeed').textContent = incident.sv_precrash_speed_mph ? `${incident.sv_precrash_speed_mph} MPH` : 'N/A';
+            document.getElementById('faultAnalysisOtherMovement').textContent = incident.cp_pre_crash_movement || 'N/A';
+            document.getElementById('faultAnalysisRoadwayType').textContent = incident.roadway_type || 'N/A';
+            document.getElementById('faultAnalysisSpeedLimit').textContent = incident.posted_speed_limit_mph ? `${incident.posted_speed_limit_mph} MPH` : 'N/A';
+            document.getElementById('faultAnalysisLighting').textContent = incident.lighting || 'N/A';
+            document.getElementById('faultAnalysisPropertyDamage').textContent = incident.property_damage || 'N/A';
+            
+            // Weather conditions
+            const weather = [];
+            if (incident.weather_clear === 'Y') weather.push('Clear');
+            if (incident.weather_snow === 'Y') weather.push('Snow');
+            if (incident.weather_cloudy === 'Y') weather.push('Cloudy');
+            if (incident.weather_fog_smoke === 'Y') weather.push('Fog/Smoke');
+            if (incident.weather_rain === 'Y') weather.push('Rain');
+            if (incident.weather_severe_wind === 'Y') weather.push('Severe Wind');
+            if (incident.weather_other === 'Y') weather.push(`Other: ${incident.weather_other_text || ''}`);
+            if (incident.weather_unknown === 'Y') weather.push('Unknown');
+            
+            document.getElementById('faultAnalysisWeather').textContent = weather.length > 0 ? weather.join(', ') : 'N/A';
         }
 
         function updateSessionInfo(sessionData) {
@@ -1009,25 +1197,57 @@
             }
         }
 
-        function showFinalDecision(decision) {
-            document.getElementById('activeSessionSection').style.display = 'none';
-            document.getElementById('finalDecisionSection').style.display = 'block';
+        function showFinalDecision(decision, sessionData) {
+            // Keep the active session visible but hide the input section
+            document.getElementById('argumentInputSection').style.display = 'none';
+            document.getElementById('processingState').style.display = 'none';
             
-            // Populate decision data
-            const statusElement = document.getElementById('finalFaultStatus');
-            if (decision.fault_status === 'Yes') {
-                statusElement.textContent = 'Yes';
-                statusElement.className = 'badge bg-danger';
-            } else if (decision.fault_status === 'No') {
-                statusElement.textContent = 'No';
-                statusElement.className = 'badge bg-success';
-            } else {
-                statusElement.textContent = 'Unknown';
-                statusElement.className = 'badge bg-secondary';
+            // Add a final decision banner above the conversation
+            const conversationContainer = document.getElementById('conversationContainer');
+            let finalDecisionBanner = document.getElementById('finalDecisionBanner');
+            
+            if (!finalDecisionBanner) {
+                finalDecisionBanner = document.createElement('div');
+                finalDecisionBanner.id = 'finalDecisionBanner';
+                finalDecisionBanner.className = 'alert alert-success mb-3';
+                conversationContainer.parentNode.insertBefore(finalDecisionBanner, conversationContainer);
             }
             
-            document.getElementById('finalFaultPercentage').textContent = `${decision.fault_percentage}%`;
-            document.getElementById('finalReasoning').textContent = decision.reasoning || decision.full_response;
+            // Populate the banner with decision
+            const statusBadge = decision.fault_status === 'Yes' ? 
+                '<span class="badge bg-danger">At Fault</span>' : 
+                decision.fault_status === 'No' ? 
+                '<span class="badge bg-success">Not At Fault</span>' :
+                '<span class="badge bg-secondary">Unknown</span>';
+            
+            finalDecisionBanner.innerHTML = `
+                <h6 class="alert-heading"><i class="fas fa-gavel"></i> Final Judgment</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>AV At Fault:</strong> ${statusBadge}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Fault Percentage:</strong> ${decision.fault_percentage}%
+                    </div>
+                </div>
+                <hr>
+                <p class="mb-0"><strong>Judge's Reasoning:</strong> ${decision.reasoning || decision.full_response}</p>
+            `;
+            
+            // Update the conversation to include all messages (should already be done by updateConversationDisplay)
+            if (sessionData) {
+                updateConversationDisplay(sessionData);
+            }
+            
+            // Add session complete indicators
+            const sessionInfo = document.getElementById('sessionInfo');
+            sessionInfo.innerHTML += ' <span class="badge bg-success ms-2">Session Complete</span>';
+            
+            // Hide the "Go to Judge" button and show "New Session" prominently
+            document.getElementById('goToJudgeBtn').style.display = 'none';
+            document.getElementById('endSessionBtn').style.display = 'none';
+            document.getElementById('newSessionBtn').textContent = 'Start New Session';
+            document.getElementById('newSessionBtn').className = 'btn btn-primary btn-sm';
         }
 
         function showInteractiveFaultError(message) {
