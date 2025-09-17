@@ -193,7 +193,7 @@ class InteractiveFaultGraph:
         #     max_tokens=500
         # )
         model_name = "claude-3-5-haiku-latest" # claude-3-7-sonnet-latest claude-sonnet-4-0 claude-opus-4-1 
-        print(f"DEBUG: Using model: {model_name}")
+        #print(f"DEBUG: Using model: {model_name}")
         self.llm = ChatAnthropic(
             model_name=model_name,
             temperature=0.3,  # Slightly creative but mostly factual
