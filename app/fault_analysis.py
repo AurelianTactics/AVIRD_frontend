@@ -14,6 +14,7 @@ except ImportError:
 
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 from langchain_openai import ChatOpenAI
+from langchain_anthropic import ChatAnthropic
 from langgraph.graph import StateGraph, START, END, MessagesState
 from langgraph.graph.message import add_messages
 from langgraph.checkpoint.memory import MemorySaver
@@ -24,7 +25,8 @@ def _set_env(var: str):
         os.environ[var] = getpass.getpass(f"{var}: ")
 
 # Ensure OpenAI API key is set
-_set_env("OPENAI_API_KEY")
+#_set_env("OPENAI_API_KEY")
+_set_env("ANTHROPIC_API_KEY")
 
 # Enable LangSmith logging for debugging
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
@@ -185,11 +187,19 @@ Reasoning: [Your explanation]
 
 class InteractiveFaultGraph:
     def __init__(self):
-        self.llm = ChatOpenAI(
-            model_name="gpt-4o-mini",
+        # self.llm = ChatOpenAI(
+        #     model_name="gpt-4o-mini",
+        #     temperature=0.3,  # Slightly creative but mostly factual
+        #     max_tokens=500
+        # )
+        model_name = "claude-3-5-haiku-latest" # claude-3-7-sonnet-latest claude-sonnet-4-0 claude-opus-4-1 
+        print(f"DEBUG: Using model: {model_name}")
+        self.llm = ChatAnthropic(
+            model_name=model_name,
             temperature=0.3,  # Slightly creative but mostly factual
             max_tokens=500
         )
+
         self.memory = MemorySaver()
         self.graph = self._build_graph()
     
